@@ -1,0 +1,250 @@
+****All changes are noted by the arrows****
+
+
+Question 1:
+
+a) 
+(1) The parentheses are necessary because without them, the program would not compile because it would follow the pointer and then try to add the integer 1 which is not allowed.
+By adding the paratheses, it makes the pointer point to one position further in the array (only allowed if it already points to an array) and then follow it.
+(2) We must add this so that when going through the while loop, it starts printing the values starting at the beginning of the array instead of the end.
+(3) Since we are writing from the beginning, we need to iterate until the end of the array (denoted by arr + 2).
+(4)/(5) First, the line structures must be switched so it prints the variable at the position before moving on. Also, it should now say ptr++; for (5) because we are moving left to right
+instead of right to left like it used to be doing.
+
+
+int main()
+{
+	int arr[3] = { 5, 10, 15 };
+	int* ptr = arr;
+
+	*ptr = 30;          // set arr[0] to 30
+(1)==> 	*(ptr + 1) = 20;      // set arr[1] to 20
+	ptr += 2;
+	ptr[0] = 10;        // set arr[2] to 10
+(2)==>	ptr = arr;
+
+(3)==>	while (ptr <= arr + 2)
+	{
+(4)==>		cout << *ptr << endl;    // print values
+(5)==>		ptr++;
+	}
+}
+
+b) 
+The only change necessary here is to add an & to the parameter "int* pToMax" because we would like to change its values outside the function. This can be tricky because the actual pointer
+gets changed, but the values it points to go back to how they were. This would cause an error when trying to print out "*ptr" at the end of the function.
+
+void findMax(int arr[], int n, int*& pToMax) <==(1)
+{
+	if (n <= 0)
+		return;      // no items, no maximum!
+
+	pToMax = arr;
+
+	for (int i = 1; i < n; i++)
+	{
+		if (arr[i] > *pToMax)
+			pToMax = arr + i;
+	}
+}
+
+int main()
+{
+	int nums[4] = { 5, 3, 15, 6 };
+	int* ptr;
+
+	findMax(nums, 4, ptr);
+	cout << "The maximum is at address " << ptr << endl;
+	cout << "It's at position " << ptr - nums << endl;
+	cout << "Its value is " << *ptr << endl;
+}
+
+
+c) 
+The only way to fix this is to initialize the pointer to something before running the function, but it cannot be the nullptr. Thus, we have to create some set address for it to reference
+and store the cubed value that it points to. (1) does this by making an array of one single element somewhere in memory. (2) initializes the pointer to point to this memory location so that
+we can now keep the cubed number and remember where we need to point later on (dereference) to get it back. 
+
+void computeCube(int n, int* ncubed)
+{
+	*ncubed = n * n * n;
+}
+
+int main()
+{
+(1)==>	int array[1];
+(2)==>	int* ptr = array;
+	computeCube(5, ptr);
+	cout << "Five cubed is " << *ptr << endl;
+}
+
+d)
+The problem was that the original function compared two c strings directly and tried to iterate through them like you would with a pointer. To remedy this, all I needed to do was create 
+pointers to the arrays and adjust some of the following syntax.
+(1) Creates two pointers and initializes them the the first elements of the two strings respectively. Notice they must be declared as const to ensure compatability.
+(2) We need to dereference both pointers and iterate through until one ends (meaning the char it points to is the zero byte).
+(3) We must compare the value both pointers point to.
+(4) After the comparison at the current position, move on by adding 1 to the actual pointer (not its dereferenced value).
+(5) If we get all the way through to the end of both, we need to see if the dereferenced values are equal. This will return true if both point to the zero byte(which is what we want) and
+false if one of the c strings keeps going (which is also desirable).
+
+// return true if two C strings are equal
+bool strequal(const char str1[], const char str2[])
+{
+(1)==>	const char* ptr1 = str1;
+==>	const char* ptr2 = str2;
+(2)==>	while (*ptr1 != '\0' && *ptr2 != '\0')
+	{
+(3)==>		if (*ptr1 != *ptr2)  // compare corresponding characters
+			return false;
+(4)==>		ptr1++;            // advance to the next character
+		ptr2++;
+	}
+(5)==>	return *ptr1 == *ptr2;   // both ended at same time?
+}
+
+int main()
+{
+	char a[15] = "Zhou";
+	char b[15] = "Zhu";
+
+	if (strequal(a, b))
+		cout << "They're the same person!\n";
+}
+
+
+e)
+In the main program, it passes the integer n through getPointerToArray which, at first glance, would seem to produce the intended output because it does set n to be 100 as n is passed by
+reference. Unfortunately, the array that is created in the function that holds 100 through 1 in descending order is useless after calling the function with n, so you can't successfully
+reference the result afterwards.
+
+
+
+
+Question 2:
+
+a) double* cat;
+b) double mouse[5];
+c) cat = mouse + 4;
+d) *cat = 25;
+e) *(mouse + 3) = 42;
+f) cat -= 3;
+g) cat[1] = 54; 
+h) cat[0] = 27;
+i) bool b = (*cat == *(cat + 1));
+j) bool d = (cat == mouse);
+
+
+
+Question 3:
+
+a)
+double mean(const double* scores, int numScores)
+    {
+	int step = 0;
+        const double* ptr = scores;
+        double tot = 0;
+        while (step != numScores)
+        {
+            tot += *(ptr + step);
+            step++;
+        }
+        return tot/numScores;
+    }
+
+
+b)
+// This function searches through str for the character chr.
+    // If the chr is found, it returns a pointer into str where
+    // the character was first found, otherwise nullptr (not found).
+
+    const char* findTheChar(const char* ptr, char chr)
+    {
+        while (*ptr != '\0')
+	{
+            if (*ptr == chr)
+                return ptr;
+	ptr++;
+	}
+
+        return nullptr;
+    }
+
+
+Question 4:
+
+#include <iostream>
+    using namespace std;
+
+    int* maxwell(int* a, int* b)		//this will create a pointer to whichever int the parameters point to is largest
+    {
+        if (*a > *b)
+            return a;
+        else
+            return b;
+    }
+
+    void swap1(int* a, int* b)			//this will swap 2 pointers to the parameters
+    {
+        int* temp = a;
+        a = b;
+        b = temp;
+    }
+
+    void swap2(int* a, int* b)			//this is the same as swap1, but it will actually swap the values the parameters point to
+    {
+        int temp = *a;
+        *a = *b;
+        *b = temp;
+    }
+
+    int main()
+    {
+        int array[6] = { 5, 3, 4, 17, 22, 19 };  //simple array declaration
+
+        int* ptr = maxwell(array, &array[2]);   //creates a pointer to array[0] (5) because 5 is larger than 4
+        *ptr = -1;				//sets the value at that pointer (currently 5) to be -1. Now the array is { -1, 3, 4, 17, 22, 19 }
+        ptr += 2;				//move the ptr 2 places to the right. Now it points to array[2] (4).
+        ptr[1] = 9;				//set the variable one place to the right of the ptr to 9. (like saying array[2 + 1] = 9). Now the array is { -1, 3, 4, 9, 22, 19 }
+        *(array+1) = 79;			//set the value at array[1] to be 79. Now the array is { -1, 79, 4, 9, 22, 19 }
+
+        cout << &array[5] - ptr << endl;	//********write out the difference in positions between array[5] and wherever the ptr points to. Since ptr currently points to array[2], it's like saying cout << (5 - 2). Thus, it writes out 3.
+
+        swap1(&array[0], &array[1]);		//swap 2 pointers that point to the first and second elements of the array. Essentially this does nothing.
+        swap2(array, &array[2]);		//swap the value at array[0] (-1) and array[2] (4). Now the array is { 4, 79, -1, 9, 22, 19 }
+
+        for (int i = 0; i < 6; i++)		//go through each element of the array
+            cout << array[i] << endl;		//********write out the elements in order one on each line. 
+    } 
+
+We have already established that the array is { 4, 79, -1, 9, 22, 19 }, so the program writes:
+3 <== the first output (difference of positions)
+4 <== start of the new array
+79
+-1
+9
+22
+19 <== end of the new array
+(end program)
+
+
+
+Question 5:
+
+void removeS(char* original)
+{
+	char* output = original;
+	while (*output != '\0')
+	{
+		if (*output == 'S' || *output == 's')
+		{
+			while (*output != '\0')
+			{
+				*output = *(output + 1);
+				output++;
+			}
+			output = original;
+		}
+		output++;
+	}
+}
